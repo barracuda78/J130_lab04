@@ -5,7 +5,7 @@ package ruzaevj130lab04.client;
 //1. класс ClientGuiController унаследованный от Client.
 public class ClientGuiController extends Client {
     
-    //точка входа - запуск оконного клиента:
+    //точка входа - запуск оконного клиента: запускаеьтся так же из класса SimpleChat.
     public static void main(String[] args) {
         new ClientGuiController().run();
     }
@@ -31,17 +31,16 @@ public class ClientGuiController extends Client {
             view.refreshUsers();
         }
 
-        //в) void informAboutDeletingNewUser(String userName) - должен удалять пользователя из модели и вызывать обновление вывода пользователей у отображения.
+        //в) void informAboutDeletingNewUser(String userName) - должен удалять пользователя из модели и вызывать обновление вывода пользователей у отображения (View).
         protected void informAboutDeletingNewUser(String userName){
             model.deleteUser(userName);
             view.refreshUsers();
         }
-        //г) void notifyConnectionStatusChanged(boolean clientConnected) - должен вызывать аналогичный метод у представления.
+        //г) void notifyConnectionStatusChanged(boolean clientConnected) - должен вызывать аналогичный метод у представления (Model).
         protected void notifyConnectionStatusChanged(boolean clientConnected){
             view.notifyConnectionStatusChanged(clientConnected);
         }
     }
-
 
     //5. Переопределил методы в классе ClientGuiController:
     //а) SocketThread getSocketThread() - должен создавать и возвращать объект типа GuiSocketThread.
@@ -58,7 +57,7 @@ public class ClientGuiController extends Client {
     }
 
     //в) getServerAddress(), getServerPort(), getUserName().
-    //Они должны вызывать одноименные методы из представления (view).
+    //Они вызывают одноименные методы из представления (view).
     protected String getServerAddress(){
         return view.getServerAddress();
     }

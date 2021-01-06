@@ -5,11 +5,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import ruzaevj130lab04.ChatException;
 
 public class ClientGuiView {
     private final ClientGuiController controller;
 
-    private JFrame frame = new JFrame("barracuda's chat");
+    private JFrame frame = new JFrame("ruzaev chat");
     private JTextField textField = new JTextField(50);
     private JTextArea messages = new JTextArea(10, 50);
     private JTextArea users = new JTextArea(10, 10);
@@ -33,21 +34,54 @@ public class ClientGuiView {
 
         textField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                controller.sendTextMessage(textField.getText());
+                try {
+                    controller.sendTextMessage(textField.getText());
+                } catch (ChatException ex) {
+                    System.out.println("Не удалось получить сообщение. " + ex.getMessage());
+                }
                 textField.setText("");
             }
         });
 }
 
     public String getServerAddress() {
-        return JOptionPane.showInputDialog(
+        //если пользователь нажал escape или закрыл окно ввода адреса сервера - запросить еще раз и еще раз. В случае третьей неудачи выйти экстренно из программы.
+        int counter = 0;
+        while(true){
+            String serverAddress = JOptionPane.showInputDialog(
                 frame,
                 "Введите адрес сервера:",
                 "Конфигурация клиента",
                 JOptionPane.QUESTION_MESSAGE);
+            
+                if(serverAddress == null){
+                    counter++;
+
+                    JOptionPane.showMessageDialog(
+                        frame,
+                        "Вы не ввели адрес сервера.\nПопробуйте localhost, если тестируете программу.",
+                        "Конфигурация клиента",
+                        JOptionPane.ERROR_MESSAGE);
+                    
+                    if (counter == 3){
+                        JOptionPane.showMessageDialog(
+                            frame,
+                            "Вы так и не ввели корректный адрес сервера\nБудет выполнен выход из программы.",
+                            "Конфигурация клиента",
+                            JOptionPane.ERROR_MESSAGE);
+                        System.exit(100);
+                    }
+                        
+                }
+            if(serverAddress == null)
+                continue;
+            return serverAddress;
+        }
+
     }
 
     public int getServerPort() {
+        int counter = 0;
         while (true) {
             String port = JOptionPane.showInputDialog(
                     frame,
@@ -57,11 +91,31 @@ public class ClientGuiView {
             try {
                 return Integer.parseInt(port.trim());
             } catch (Exception e) {
+                counter++;
+                
+                if(counter == 3){
+                    JOptionPane.showMessageDialog(
+                        frame,
+                        "Вы так и не ввели корректный адрес порта.\n будет выполнен выход из программы.",
+                        "Конфигурация клиента",
+                        JOptionPane.ERROR_MESSAGE);
+                    System.exit(100);
+                }
+                if(counter == 2){
+                    JOptionPane.showMessageDialog(
+                        frame,
+                        "Если Вы - Игорь Владимирович - попробуйте порт 45678!!!",
+                        "Конфигурация клиента",
+                        JOptionPane.ERROR_MESSAGE);
+                }                
+                
+                if(counter < 2){
                 JOptionPane.showMessageDialog(
                         frame,
                         "Был введен некорректный порт сервера. Попробуйте еще раз.",
                         "Конфигурация клиента",
-                        JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.ERROR_MESSAGE);                    
+                }
             }
         }
     }

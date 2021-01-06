@@ -5,7 +5,7 @@ package ruzaevj130lab04;
  *
  * @author (C)Y.D.Zakovryashin, 01.12.2020
  */
-class ChatException extends Exception {
+public class ChatException extends Exception {
 
     public ChatException() {
     }

@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Server {
     private static Map<String, Connection> connectionMap = new ConcurrentHashMap<>();
 
-//точка входа в программу: запуск серерной части программы:
+//точка входа в программу: запуск серерной части программы: запускаю не здесь а из класса SimpleChat.
 //    public static void main(String[] args){
 //    
 //        //если запускать сервер отсюда - возможно задать самому с клавиатуры из консоли нуомер порта:

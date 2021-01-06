@@ -2,6 +2,7 @@ package ruzaevj130lab04.client;
 
 import java.io.IOException;
 import java.net.Socket;
+import ruzaevj130lab04.ChatException;
 import ruzaevj130lab04.Connection;
 import ruzaevj130lab04.ConsoleHelper;
 import ruzaevj130lab04.Message;
@@ -24,6 +25,7 @@ public class Client {
         public void run(){
             String serverAddress = getServerAddress();
             int serverPort = getServerPort();
+                       
             try (Socket socket = new Socket(serverAddress, serverPort);
                  Connection connection = new Connection(socket)){
                 Client.this.connection = connection;
@@ -161,7 +163,11 @@ public class Client {
                 if(s.equals("exit"))
                     break;
                 if(shouldSendTextFromConsole()){
-                    sendTextMessage(s);
+                    try {
+                        sendTextMessage(s);
+                    } catch (ChatException ex) {
+                        System.out.println("Сообщение не отправлено" + ex.getMessage());
+                    }
                 }
             }
         }
@@ -201,16 +207,16 @@ public class Client {
     //Если во время отправки произошло исключение IOException, то необходимо вывести информацию об этом пользователю и присвоить false полю clientConnected.
     //5. Метод sendTextMessage() должен создавать и отправлять новое текстовое сообщение используя connection
     // и устанавливать флаг clientConnected в false, если во время отправки или создания сообщения возникло исключение IOException.
-    protected void sendTextMessage(String text) {
+    protected void sendTextMessage(String text) throws ChatException{
 
         try {
             Message message = new Message(MessageType.TEXT, text);
             connection.send(message);
         } catch (IOException e) {
             clientConnected = false;
+            throw new ChatException();
             //ConsoleHelper.writeMessage("во время отправки произошло исключение IOException");
             //e.printStackTrace();
         }
     }
 }
-

@@ -16,12 +16,12 @@ import ruzaevj130lab04.client.ClientGuiController;
 public class SimpleChat implements ISimpleChat {
 
     //поля для сервера.
-    private static StringBuffer sb = new StringBuffer();
+    private static StringBuffer sb = new StringBuffer(); //больше не использую бля хранения сообщений.
     private Socket clientSocket;
     private InputStream inputStream;
     private OutputStream outputStream;
     
-//поля для клента:
+    //поля для клента:
     private String inetAddress;
     private int serverPort;
     
@@ -36,7 +36,7 @@ public class SimpleChat implements ISimpleChat {
     public void client() throws ChatException {
         
         new ClientGuiController().run(); // <--- запуск клиента в отдельном потоке ( в классе Client - есть внутренний (нестатический) класс SocketThread extends Thread
-                                         // <--- а ClientGuiController extends Client.
+                                         // <--- а класс ClientGuiController extends Client.
                 
         //закомментировал так как выношу логику клиента в отдкльный пакет client для удобства вместе с графическим интерфейсом клиента.:
         
@@ -87,7 +87,7 @@ public class SimpleChat implements ISimpleChat {
         //            int n = 0;
         //            while(true){
         //                n = inputStream.read(buffer);
-        //                //if (n < 0)                      // <---нет условия выхода, т.к. сервер работает вечно.
+        //                //if (n < 0)                      // <---закомментил условие выхода, т.к. сервер работает вечно.
         //                //    break;
         //                outputStream.write(buffer, 0, n);
         //                String s = new String(buffer);
@@ -118,7 +118,18 @@ public class SimpleChat implements ISimpleChat {
      */
     @Override
     public String getMessage() throws ChatException {
-        return sb.toString();
+        //перенес логику получения сообщений в класс Client метод clientMainLoop() - т.к. клиентов может быть много. Метод вызывается на клиенте.
+        //в этом методе получается сообщение с помощью метода recieve() в классе Connection:
+        //connection.receive()
+        //Этот метод receive() класса Connection реализован через ObjectInputStream in = new ObjectInputStream(socket.getInputStream()) - 
+        //поскольку у меня Message - это отдельный класс, который содержит сам текст сообщения и тип сообщения согласно enum MessageType.
+        //InputStream - оболочка для InputStream, полученного из сокета методом getInputStream().
+        
+        // Реализовано зеркально - так же как в следующем методе sendMessage(String message).
+        //в методе clientMainLoop() определяется тип сообщения.
+        
+        //return sb.toString();
+        return null;
     }
 
     /**
@@ -130,11 +141,18 @@ public class SimpleChat implements ISimpleChat {
      */    
     @Override
     public void sendMessage(String message) throws ChatException {
-        
+        //перенес отсюда логику отправки клиентом сообщения в класс Client в пакете client (поскольку клиентов может быть несколько).
+        //В классе Client вызывается метод sendTextMessage(String text);
+        //В классе Client в методе sendTextMessage(String text) сначала создается объект класса Message (написан в отдельном файле)
+        //(который содержит сам текст (String text) сообщения и тип сообщения (MessageType.TEXT) - чтобы отделять одни сообщения от других).
+        //Затем этот объект класса Message передается методу send(Message message) класса Connection;
+        //А в методе send() используется ObjectOutputStream oos для записи объекта message и метод oos.write(message),
+        //Сам ObjectOutputStream строится на OutputStream полученном на сокете методом getOutputStream().
     }
 
     @Override
     public void close() throws ChatException {
+        //В итоге использую метод close() из класса Connection;
         try{
         outputStream.close();
         inputStream.close();
